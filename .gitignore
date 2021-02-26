@@ -1,0 +1,6 @@
+.env.prod
+.env.prod.db
+db.sqlite3
+Pipfile
+Pipfile.lock
+**/migrations/0*

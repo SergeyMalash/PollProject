@@ -1,0 +1,882 @@
+openapi: 3.0.3
+info:
+  title: Poll API
+  description: Poll API created for learning OpenAPI and Swagger
+  version: 1.0.0
+  termsOfService: 'https://openweathermap.org/terms'
+  contact:
+    name: OpenWeatherMap API
+    url: 'http://openweathermap.org/api'
+    email: some_email@gmail.com
+  license:
+    name: CC Attribution-ShareAlike 4.0 (CC BY-SA 4.0)
+    url: 'https://openweathermap.org/price'
+servers:
+  - url: 'http://127.0.0.1/api'
+    description: test
+  - url: 'https://{username}.gigantic-server.com:{port}/{basePath}'
+    description: The production API server
+    variables:
+      username:
+        default: demo
+        description: >-
+          this value is assigned by the service provider, in this example
+          `gigantic-server.com`
+      port:
+        enum:
+          - '8443'
+          - '443'
+        default: '8443'
+      basePath:
+        default: v2
+paths:
+  /polls/:
+    post:
+      tags:
+        - Взаимодействие с опросами
+      summary: Создание опроса
+      description: Создание опроса
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: create poll
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Poll"
+      responses:
+        201:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PollFull"
+        400:
+          description: invalid POST request
+          content:
+            application/json:
+              examples:
+                fieldError:
+                  $ref: "#/components/examples/fieldError"
+                otherErrors:
+                  $ref: "#/components/examples/otherErrors"
+    get:
+      tags:
+        - Взаимодействие с опросами
+      summary: Получение всех опросов
+      description: Получение всех опросов
+      responses:
+        200:
+          description: Получение всех опросов. Возвращает массив с объектами опросов
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PollFull"
+  /polls/{id}/:
+    get:
+      tags:
+      - Взаимодействие с опросами
+      summary: Получение опроса
+      description: Для получения определённого опроса необходимо передать его идентификатор
+      parameters:
+        - $ref: '#/components/parameters/idParam'
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PollFull"
+        404:
+          $ref: "#/components/responses/404NotFound"
+    delete:
+      security:
+        - bearerAuth: []
+      tags:
+        - Взаимодействие с опросами
+      summary: Удаление опроса
+      operationId: deletePoll
+      parameters:
+        - $ref: '#/components/parameters/idParam'
+      responses:
+        204:
+          description: Успешное удаление, ничего не возвращает кроме HTTP кода 204
+        404:
+          $ref: "#/components/responses/404NotFound"
+    patch:
+      security:
+        - bearerAuth: []
+      tags:
+        - Взаимодействие с опросами
+      summary: Частичное обновление опроса.
+      parameters:
+        - $ref: '#/components/parameters/idParam'
+      requestBody:
+        description: Необходимо передать только те поля, которые требуется изменить
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Poll"
+      responses:
+        200:
+          description: Частичное обновление опроса. Возвращает обновлённый опрос
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PollFull"
+        404:
+          $ref: "#/components/responses/404NotFound"
+        400:
+          description: invalid POST request
+          content:
+            application/json:
+              examples:
+                fieldError:
+                  $ref: "#/components/examples/fieldError"
+                otherErrors:
+                  $ref: "#/components/examples/otherErrors"
+    put:
+      security:
+        - bearerAuth: []
+      tags:
+        - Взаимодействие с опросами
+      summary: Полное обновление опроса
+      parameters:
+        - $ref: '#/components/parameters/idParam'
+      responses:
+        200:
+          description: Частичное обновление опроса. Возвращает обновлённый опрос
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PollFull"
+        404:
+          $ref: "#/components/responses/404NotFound"
+        400:
+          description: invalid POST request
+          content:
+            application/json:
+              examples:
+                fieldError:
+                  $ref: "#/components/examples/fieldError"
+                otherErrors:
+                  $ref: "#/components/examples/otherErrors"
+      requestBody:
+        description: patch poll
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Poll"
+  /polls/{id}/questions/:
+    get:
+      tags:
+      - Взаимодействие с вопросами
+      summary: Получение вопросов в опросе
+      description: Для получения вопросов определённого опроса необходимо передать его идентификатор
+      parameters:
+        - $ref: '#/components/parameters/idParam'
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/QuestionFull"
+        404:
+          $ref: "#/components/responses/404NotFound"
+  /questions/:
+    get:
+      tags:
+        - Взаимодействие с вопросами
+      summary: Получение всех вопросов
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Возвращает все вопросы
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Question"
+    post:
+      tags:
+        - Взаимодействие с вопросами
+      summary: Создание вопроса
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Question"
+      responses:
+        201:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QuestionFull"
+        404:
+          $ref: "#/components/responses/404NotFound"
+        400:
+          description: invalid POST request
+          content:
+            application/json:
+              examples:
+                fieldError:
+                  $ref: "#/components/examples/fieldError"
+                otherErrors:
+                  $ref: "#/components/examples/otherErrors"
+  /questions/{id}/:
+    get:
+      tags:
+        - Взаимодействие с вопросами
+      description: Возвращает вопрос по id
+      summary: Получение вопроса по идентификатору
+      parameters:
+        - $ref: '#/components/parameters/idParam'
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Question"
+        404:
+          $ref: "#/components/responses/404NotFound"
+    delete:
+      security:
+        - bearerAuth: []
+      tags:
+        - Взаимодействие с вопросами
+      summary: Удаление вопроса
+      parameters:
+        - $ref: '#/components/parameters/idParam'
+      responses:
+        204:
+          description: Успешное удаление, ничего не возвращает кроме HTTP кода 204
+        404:
+          $ref: "#/components/responses/404NotFound"
+    patch:
+      security:
+        - bearerAuth: []
+      tags:
+        - Взаимодействие с вопросами
+      summary: Частичное обновление вопроса.
+      parameters:
+        - $ref: '#/components/parameters/idParam'
+      requestBody:
+        description: Необходимо передать только те поля, которые требуется изменить
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Question"
+      responses:
+        200:
+          description: Частичное обновление вопроса. Возвращает обновлённый вопрос
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QuestionFull"
+        404:
+          $ref: "#/components/responses/404NotFound"
+        400:
+          description: invalid POST request
+          content:
+            application/json:
+              examples:
+                fieldError:
+                  $ref: "#/components/examples/fieldError"
+                otherErrors:
+                  $ref: "#/components/examples/otherErrors"
+    put:
+      security:
+        - bearerAuth: []
+      tags:
+        - Взаимодействие с вопросами
+      summary: Обновление вопроса.
+      parameters:
+        - $ref: '#/components/parameters/idParam'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Question"
+      responses:
+        200:
+          description: Обновление вопроса. Возвращает обновлённый вопрос
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QuestionFull"
+        404:
+          $ref: "#/components/responses/404NotFound"
+        400:
+          description: invalid POST request
+          content:
+            application/json:
+              examples:
+                fieldError:
+                  $ref: "#/components/examples/fieldError"
+                otherErrors:
+                  $ref: "#/components/examples/otherErrors"
+  /choices/:
+    post:
+      summary: Создание варианта ответа
+      description: Варианты ответа используются только в вопросах с типом "single" и "multiple"
+      security:
+        - bearerAuth: []
+      tags:
+        - Варианты ответа
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Choice"
+      responses:
+        201:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChoiceFull"
+        400:
+          description: invalid POST request
+          content:
+            application/json:
+              examples:
+                fieldError:
+                  $ref: "#/components/examples/fieldError"
+                otherErrors:
+                  $ref: "#/components/examples/otherErrors"
+    get:
+      summary: Получение всех вариантов ответа
+      security:
+        - bearerAuth: []
+      tags:
+        - Варианты ответа
+      description: Получение всех вариантов ответа
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ChoiceFull"
+  /choices/{id}/:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Получение варинта ответа
+      tags:
+        - Варианты ответа
+      description: Получение варианта ответа
+      parameters:
+        - $ref: "#/components/parameters/idParam"
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChoiceFull"
+        404:
+          $ref: "#/components/responses/404NotFound"
+    delete:
+      security:
+        - bearerAuth: []
+      tags:
+        - Варианты ответа
+      summary: Удаление варианта ответа
+      parameters:
+        - $ref: '#/components/parameters/idParam'
+      responses:
+        204:
+          description: Успешное удаление, ничего не возвращает кроме HTTP кода 204
+        404:
+          $ref: "#/components/responses/404NotFound"
+    patch:
+      security:
+        - bearerAuth: []
+      tags:
+        - Варианты ответа
+      summary: Частичное обновление варианта ответа.
+      parameters:
+        - $ref: '#/components/parameters/idParam'
+      requestBody:
+        description: Необходимо передать только те поля, которые требуется изменить
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Choice"
+      responses:
+        200:
+          description: Частичное обновление варианта ответа. Возвращает обновлённый вариант ответа
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChoiceFull"
+        404:
+          $ref: "#/components/responses/404NotFound"
+        400:
+          description: invalid POST request
+          content:
+            application/json:
+              examples:
+                fieldError:
+                  $ref: "#/components/examples/fieldError"
+                otherErrors:
+                  $ref: "#/components/examples/otherErrors"
+    put:
+      security:
+        - bearerAuth: []
+      tags:
+        - Варианты ответа
+      summary: Частичное обновление варианта ответа.
+      parameters:
+        - $ref: '#/components/parameters/idParam'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Choice"
+      responses:
+        200:
+          description: Частичное обновление опроса. Возвращает обновлённый опрос
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChoiceFull"
+        404:
+          $ref: "#/components/responses/404NotFound"
+        400:
+          description: invalid POST request
+          content:
+            application/json:
+              examples:
+                fieldError:
+                  $ref: "#/components/examples/fieldError"
+                otherErrors:
+                  $ref: "#/components/examples/otherErrors"
+  /answers/:
+    get:
+      tags:
+        - Ответы на вопросы
+      security:
+        - bearerAuth: []
+      summary: Получение всех ответов на вопросы
+      responses:
+        200:
+          description: Получение всех ответов на вопросы
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AnswerFull"
+    post:
+      summary: Создание ответа
+      tags:
+        - Ответы на вопросы
+      responses:
+        201:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnswerFull"
+        400:
+          description: invalid POST request
+          content:
+            application/json:
+              examples:
+                fieldError:
+                  $ref: "#/components/examples/fieldError"
+                otherErrors:
+                  $ref: "#/components/examples/otherErrors"
+  /answers/{id}/:
+    patch:
+      security:
+        - bearerAuth: []
+      summary: Обновление ответа
+      tags:
+        - Ответы на вопросы
+      parameters:
+        - $ref: "#/components/parameters/idParam"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Answer"
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnswerFull"
+        400:
+          description: invalid PATCH request
+          content:
+            application/json:
+              examples:
+                fieldError:
+                  $ref: "#/components/examples/fieldError"
+                otherErrors:
+                  $ref: "#/components/examples/otherErrors"
+    put:
+      security:
+        - bearerAuth: []
+      summary: Обновление ответа
+      tags:
+        - Ответы на вопросы
+      parameters:
+        - $ref: "#/components/parameters/idParam"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Answer"
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnswerFull"
+        400:
+          description: invalid PATCH request
+          content:
+            application/json:
+              examples:
+                fieldError:
+                  $ref: "#/components/examples/fieldError"
+                otherErrors:
+                  $ref: "#/components/examples/otherErrors"
+    delete:
+      security:
+        - bearerAuth: []
+      summary: Удаление ответа
+      tags:
+        - Ответы на вопросы
+      parameters:
+        - $ref: '#/components/parameters/idParam'
+      responses:
+        204:
+          description: Успешное удаление, ничего не возвращает кроме HTTP кода 204
+        404:
+          $ref: "#/components/responses/404NotFound"
+  /start_poll/:
+    post:
+      tags:
+        - Прохождение опроса
+      summary: Начало прохождения опроса.
+      description: После успешного POST запроса возвращается объект с идентификатором "id", который нужно указывать при отправке каждого ответа ("anwer") в поле "started_poll".
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StartPoll"
+      responses:
+        201:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StartedPoll"
+  /started_polls/{idUser}/{id}/:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - Прохождение опроса
+      summary: Вывести один пройденный опрос у указанного пользователя
+      description: Вывести один пройденный опрос ("id") у одного пользователя ("idUser")
+      parameters:
+        - $ref: "#/components/parameters/idParam"
+        - $ref: "#/components/parameters/idUser"
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StartedPollFull"
+  /started_polls/{idUser}/:
+    get:
+      tags:
+        - Прохождение опроса
+      security:
+        - bearerAuth: []
+      summary: Вывести все пройденные опросы у пользователя
+      parameters:
+        - $ref: "#/components/parameters/idUser"
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/StartedPollFull"
+  /token/:
+    post:
+      tags:
+        - Токены
+      summary: Создание токена
+      operationId: createToken
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+              required:
+                - username
+                - password
+      responses:
+        '401':
+          description: Неверный логин или пароль
+          content:
+            application/json:
+              schema:
+                properties:
+                  detail:
+                    type: string
+  /token/refresh/:
+    post:
+      tags:
+        - Токены
+      summary: Обновление токена
+      operationId: updateAccessToken
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                access:
+                  type: string
+                  example: dfrw56u7juydtsrhe76ikiymd
+              required:
+                - access
+      responses:
+        '401':
+          description: Неверный логин или пароль
+          content:
+            application/json:
+              schema:
+                properties:
+                  detail:
+                    type: string
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    idParam:
+      name: id
+      in: path
+      description: Укажите идентификатор
+      required: true
+      schema:
+        type: string
+    idUser:
+      name: idUser
+      in: path
+      description: Укажите идентификатор пользователя
+      required: true
+      schema:
+        type: string
+  examples:
+    otherErrors:
+      summary: Другие ошибки
+      value:
+        detail: error description
+    fieldError:
+      summary: Ошибка в каком-либо поле
+      description: Возвращает JSON, где ключи это названия полей, а значения это массив с описанием ошибок в этом поле
+      value:
+        fieldName1:
+          - error description from the field
+        fieldName2:
+          - error description from the field
+  responses:
+    404NotFound:
+      description: Not found response
+      content:
+        application/json:
+          schema:
+            properties:
+              detail:
+                type: string
+                example: Not found.
+  schemas:
+    Poll:
+      required:
+        - title
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        finished_at:
+          type: string
+          format: date-time
+          nullable: true
+      example:
+        title: Опрос №1
+        description: Описание опроса
+        finished_at: '2021-02-15T10:09:51.138991Z'
+    PollFull:
+      allOf:
+        - $ref: "#/components/schemas/Poll"
+      properties:
+        id:
+          type: number
+        created_at:
+          type: string
+          format: date-time
+      example:
+        id: 1
+        created_at: '2021-01-15T10:09:51.138991Z'
+    Question:
+      required:
+        - title
+        - poll
+        - type
+      properties:
+        title:
+          type: string
+        poll:
+          type: number
+        type:
+          type: string
+          enum:
+            - single
+            - multiple
+            - text
+      example:
+        title: What is it?
+        poll: 1
+        type: single
+    QuestionFull:
+      allOf:
+        - $ref: "#/components/schemas/Question"
+      properties:
+        id:
+          type: number
+        choices:
+          type: array
+          items:
+            $ref: "#/components/schemas/ChoiceFull"
+      example:
+        id: 1
+        choices:
+          - id: 1
+            question: 1
+            text: "text question"
+    Choice:
+      required:
+        - text
+        - question
+      properties:
+        text:
+          type: string
+        question:
+          type: number
+      example:
+        text: Каждый день
+        question: 1
+    ChoiceFull:
+      allOf:
+        - $ref: "#/components/schemas/Choice"
+      properties:
+        id:
+          type: number
+      example:
+        id: 1
+    Answer:
+      required:
+        - question
+        - started_poll
+      properties:
+        question:
+          type: number
+        choice:
+          type: array
+          items:
+            type: number
+        choice_text:
+          type: string
+          nullable: true
+        started_poll:
+          type: number
+    AnswerFull:
+      allOf:
+        - $ref: "#/components/schemas/Answer"
+      properties:
+        id:
+          type: number
+        user:
+          type: string
+          nullable: true
+        choice:
+          type: array
+          items:
+            $ref: "#/components/schemas/ChoiceFull"
+        question:
+          $ref: "#/components/schemas/QuestionFull"
+    StartPoll:
+      required:
+        - poll
+      properties:
+        poll:
+          type: number
+          example: 1
+    StartedPoll:
+      properties:
+        id:
+          type: number
+        user:
+          type: string
+          nullable: true
+    StartedPollFull:
+      properties:
+        id:
+          type: number
+        poll:
+          type: object
+          allOf:
+            - $ref: "#/components/schemas/PollFull"
+        answers:
+          type: array
+          items:
+            type: object
+            properties:
+              question:
+                type: string
+              choice:
+                type: array
+                items:
+                  type: string
+              choice_text:
+                type: string
+                nullable: true
+externalDocs:
+  description: Find more info here
+  url: 'https://example.com'
