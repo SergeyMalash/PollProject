@@ -10,7 +10,7 @@ services:
       - media_volume:/home/app/web/media
       - dist:/home/app/web/docs
     env_file:
-      - ./.env.prod
+      - ./.env.prod.example
     depends_on:
       - db
   db:
@@ -18,7 +18,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     env_file:
-      - ./.env.prod.db
+      - ./.env.prod.db.example
   nginx:
     build: ./nginx
     ports:
