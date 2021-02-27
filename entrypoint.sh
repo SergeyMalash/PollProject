@@ -11,8 +11,9 @@ then
     echo "PostgreSQL started"
 fi
 
-#python manage.py flush --no-input
-#python manage.py makemigrations
-#python manage.py migrate
-#python manage.py loaddata data.json
+python manage.py flush --no-input
+python manage.py makemigrations
+python manage.py migrate
+python manage.py collectstatic
+python manage.py loaddata data.json
 exec "$@"

@@ -26,7 +26,7 @@ ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "*").split(" ")
 # Для примера: 'DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]'
 
 CORS_ALLOWED_ORIGINS = [
-    "http://104.154.205.120/",
+    "http://104.154.205.120",
 ]
 INSTALLED_APPS = [
     'django.contrib.admin',
