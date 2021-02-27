@@ -3,32 +3,9 @@ info:
   title: Poll API
   description: Poll API created for learning OpenAPI and Swagger
   version: 1.0.0
-  termsOfService: 'https://openweathermap.org/terms'
-  contact:
-    name: OpenWeatherMap API
-    url: 'http://openweathermap.org/api'
-    email: some_email@gmail.com
-  license:
-    name: CC Attribution-ShareAlike 4.0 (CC BY-SA 4.0)
-    url: 'https://openweathermap.org/price'
 servers:
-  - url: 'http://127.0.0.1/api'
-    description: test
-  - url: 'https://{username}.gigantic-server.com:{port}/{basePath}'
-    description: The production API server
-    variables:
-      username:
-        default: demo
-        description: >-
-          this value is assigned by the service provider, in this example
-          `gigantic-server.com`
-      port:
-        enum:
-          - '8443'
-          - '443'
-        default: '8443'
-      basePath:
-        default: v2
+  - url: 'http://104.154.205.120/api'
+    description: Poll server
 paths:
   /polls/:
     post:

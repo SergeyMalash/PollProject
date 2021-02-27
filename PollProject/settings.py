@@ -28,6 +28,9 @@ ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "*").split(" ")
 CORS_ALLOWED_ORIGINS = [
     "http://104.154.205.120",
 ]
+
+APPEND_SLASH = True
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
