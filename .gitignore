@@ -5,3 +5,4 @@ Pipfile
 Pipfile.lock
 **/migrations/0*
 .idea/
+__pycache__/
